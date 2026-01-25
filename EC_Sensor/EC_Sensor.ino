@@ -5,9 +5,9 @@
  *   exitec -> lưu các thông số đã hiệu chuẩn và thoát khỏi chế độ hiệu chuẩn
 */
 
-#include "LM35_Sensor.h"
+#include "../LM35_Sensor/LM35_Sensor.h"
 #include "EC_Sensor.h"
-#include "pins_config.h"
+#include "../pins_config.h"
 
 LM35_Sensor lm35(TEMP_PIN);
 EC_Sensor   ecSensor(EC_PIN);
@@ -42,7 +42,7 @@ void loop()
 
     Serial.print("Temp: "); Serial.print(temp); Serial.print(" | ");
     Serial.print("EC voltage: "); Serial.print(ecData.voltage); Serial.print(" | ");
-    Serial.print("EC value: "); Serial.print(ecData.value, 2); Serial.println(" ms/cm");
+    Serial.print("EC value: "); Serial.println(ecData.value, 2);
   }
 
   ecSensor.calibration(temp);

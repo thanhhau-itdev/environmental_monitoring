@@ -6,8 +6,8 @@
 */
 
 #include "PH_Sensor.h"
-#include "LM35_Sensor.h"
-#include "pins_config.h"
+#include "../LM35_Sensor/LM35_Sensor.h"
+#include "../pins_config.h"
 
 LM35_Sensor lm35(TEMP_PIN);
 PH_Sensor phSensor(PH_PIN);
@@ -42,7 +42,7 @@ void loop()
 
     Serial.print("Temp: "); Serial.print(temp); Serial.print(" | ");
     Serial.print("PH voltage: "); Serial.print(phData.voltage); Serial.print(" | ");
-    Serial.print("PH value: "); Serial.print(phData.value, 2); Serial.println(" ");
+    Serial.print("PH value: "); Serial.println(phData.value, 2);
   }
 
   phSensor.calibration(temperature);

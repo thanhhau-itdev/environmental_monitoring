@@ -1,6 +1,6 @@
-#include "LM35_Sensor.h"
+#include "../LM35_Sensor/LM35_Sensor.h"
 #include "DO_Sensor.h"
-#include "pins_config.h"
+#include "../pins_config.h"
 
 LM35_Sensor lm35(TEMP_PIN);
 DO_Sensor doSensor(DO_PIN);
@@ -33,7 +33,6 @@ void loop()
     doSensor.update(doData, temp);
 
     Serial.print("Temp: "); Serial.print(temp); Serial.print(" | ");
-    Serial.print("DO raw: "); Serial.print(doData.raw); Serial.print(" | ");
     Serial.print("DO mV: "); Serial.print(doData.voltage); Serial.print(" | ");
     Serial.print("DO value: "); Serial.println(doData.value);
   }
