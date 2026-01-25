@@ -12,9 +12,10 @@
 #define SDA_PIN 25
 #define SCL_PIN 26
 
-#define RELAY1_PIN 24  
-#define RELAY2_PIN 23
-#define RELAY3_PIN 15
-#define RELAY4_PIN 27
+#define RELAY_TEMP_PIN 24  
+#define RELAY_DO_PIN 23
+#define RELAY_PH_PIN 15
+#define RELAY_EC_PIN 27
+#define RELAY_LCD_PIN 27
 
 #endif
