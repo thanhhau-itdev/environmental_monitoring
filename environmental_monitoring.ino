@@ -4,8 +4,14 @@
 #include "DO_Sensor/DO_Sensor.h"
 #include "EC_Sensor/EC_Sensor.h"
 #include "DO_Sensor/DO_Sensor.h"
-#include "pins_config.h"
 #include "SH1106/SH1106.h"
+#include "Relay/Relay.h"
+#include "pins_config.h"
+
+Relay relay_TEMP(RELAY_TEMP_PIN);
+Relay relay_DO(RELAY_DO_PIN);
+Relay relay_PH(RELAY_PH_PIN);
+Relay relay_EC(RELAY_EC_PIN);
 
 LM35_Sensor lm35(TEMP_PIN);
 
@@ -33,6 +39,11 @@ void setup()
 {
   Serial.begin(115200);
 
+  relay_TEMP.begin();
+  relay_DO.begin();
+  relay_PH.begin();
+  relay_EC.begin();
+
   ecSensor.begin();
   phSensor.begin();
 
@@ -42,6 +53,11 @@ void setup()
     while (1);
   }
   oled.clear();
+
+  relay_TEMP.on();
+  relay_DO.on();
+  relay_PH.on();
+  relay_EC.on();
 }
 
 void loop()
