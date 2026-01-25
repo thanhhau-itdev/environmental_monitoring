@@ -2,7 +2,7 @@
 
 ## 📌 Giới thiệu
 
-Dự án **IoT Environmental Monitoring System** được xây dựng nhằm thu thập, xử lý và truyền dữ liệu quan trắc môi trường (nhiệt độ, độ ẩm, khí, áp suất, …) sử dụng vi điều khiển **ESP32-C5**.
+Dự án **IoT Environmental Monitoring System** được xây dựng nhằm thu thập, xử lý và truyền dữ liệu quan trắc môi trường sử dụng vi điều khiển **ESP32-C5**.
 
 Hệ thống được thiết kế theo hướng **mở rộng, dễ bảo trì**, áp dụng **lập trình hướng đối tượng (OOP)** và tách riêng từng chức năng thành các thư viện độc lập.
 
