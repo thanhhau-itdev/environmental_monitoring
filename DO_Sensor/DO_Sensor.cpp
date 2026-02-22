@@ -3,10 +3,10 @@
 #define VREF   3300
 #define ADC_RES 4095
 
-#define CAL1_V 1600
-#define CAL1_T 25
-#define CAL2_V 1300
-#define CAL2_T 15
+#define CAL1_V 963
+#define CAL1_T 26
+#define CAL2_V 756
+#define CAL2_T 19
 
 const uint16_t DO_Sensor::DO_Table[41] = {
   14460,14220,13820,13440,13090,12740,12420,12110,11810,11530,

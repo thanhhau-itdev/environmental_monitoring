@@ -1,7 +1,6 @@
 #include "LM35_Sensor.h"
-#include "../pins_config.h"
 
-LM35_Sensor lm35(TEMP_PIN);
+LM35_Sensor lm35(4);
 unsigned long lastTime_TEMP = 0;
 const unsigned long interval_TEMP = 1000;
 
