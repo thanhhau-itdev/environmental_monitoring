@@ -1,20 +1,11 @@
 #include <Arduino.h>
-#include <Wire.h>
-#include "LM35_Sensor/LM35_Sensor.h"
-#include "DO_Sensor/DO_Sensor.h"
-#include "EC_Sensor/EC_Sensor.h"
-#include "DO_Sensor/DO_Sensor.h"
-#include "SH1106/SH1106.h"
-#include "Relay/Relay.h"
+#include "LM35_Sensor.h"
+#include "PH_Sensor.h"
+#include "EC_Sensor.h"
+#include "DO_Sensor.h"
 #include "pins_config.h"
 
-Relay relay_TEMP(RELAY_TEMP_PIN);
-Relay relay_DO(RELAY_DO_PIN);
-Relay relay_PH(RELAY_PH_PIN);
-Relay relay_EC(RELAY_EC_PIN);
-
 LM35_Sensor lm35(TEMP_PIN);
-
 DO_Sensor doSensor(DO_PIN);
 PH_Sensor phSensor(PH_PIN);
 EC_Sensor ecSensor(EC_PIN);
@@ -25,39 +16,34 @@ EC_Sensor::EC_Data ecData;
 
 unsigned long lastTime_TEMP = 0, lastTime_DO = 0, 
               lastTime_PH = 0, lastTime_EC = 0, 
-              lastTime_LCD = 0, lastTime_Serial = 0;
+              lastTime_Serial = 0, lastTime_SendData = 0;
 
 const unsigned long interval_TEMP = 1000, interval_DO = 1000, 
                     interval_PH = 1000, interval_EC = 1000, 
-                    interval_LCD = 1000, interval_Serial = 1000;
+                    interval_Serial = 1000, interval_SendData = 5000;
 
 uint8_t temp = 0;
-uint16_t PH_voltage = 0, EC_voltage = 0, DO_voltage = 0, DO_value = 0;
+uint16_t DO_value = 0;
 float PH_value = 0, EC_value = 0;
+
+void SendData()
+{
+  String query = "";
+  query += String(temp) + ",";
+  query += String(PH_value) + ",";
+  query += String(EC_value) + ",";
+  query += String(DO_value);
+
+  Serial1.println(query);
+}
 
 void setup()
 {
   Serial.begin(115200);
-
-  relay_TEMP.begin();
-  relay_DO.begin();
-  relay_PH.begin();
-  relay_EC.begin();
-
+  Serial1.begin(9600, SERIAL_8N1, RX_PIN, TX_PIN);
+  
   ecSensor.begin();
   phSensor.begin();
-
-  Wire.begin(SDA_PIN, SCL_PIN);
-  if (!oled.begin(0x3C)) {
-    Serial.println(F("OLED init failed!"))
-    while (1);
-  }
-  oled.clear();
-  
-  relay_TEMP.on();
-  relay_DO.on();
-  relay_PH.on();
-  relay_EC.on();
 }
 
 void loop()
@@ -73,47 +59,37 @@ void loop()
     lastTime_DO = now;
     doSensor.update(doData, temp);
 
-    DO_voltage = doSensor.voltage;
-    DO_value = doSensor.value;
+    DO_value = doData.value;
   }
 
   if (now - lastTime_PH >= interval_PH) {
     lastTime_PH = now;
-    phSensor.update(phData, temperature);
-
-    PH_voltage = phSensor.voltage;
-    PH_value = phSensor.value;
+    phSensor.update(phData, temp);
+    PH_value = phData.value;
   }
 
   if (now - lastTime_EC >= interval_EC) {
     lastTime_EC = now;
     ecSensor.update(ecData, temp);
 
-    EC_voltage = ecSensor.voltage;
-    EC_value = ecSensor.value;
+    EC_value = ecData.value;
   }
 
   if (now - lastTime_Serial >= interval_Serial) {
     lastTime_Serial = now;
     
-    Serial.print("DO mV: "); Serial.print(DO_voltage); Serial.print(" | ");
-    Serial.print("DO value: "); Serial.println(DO_value);
-    Serial.print("PH mV: "); Serial.print(PH_voltage); Serial.print(" | ");
-    Serial.print("PH value: "); Serial.println(PH_value, 2);
-    Serial.print("EC mV: "); Serial.print(EC_voltage); Serial.print(" | ");
-    Serial.print("EC value: "); Serial.println(EC_value, 2);
+    Serial.print("Temp: "); Serial.print(temp);
+    Serial.print(" DO: "); Serial.print(DO_value);
+    Serial.print(" PH: "); Serial.print(PH_value, 2);
+    Serial.print(" EC: "); Serial.println(EC_value, 2);
   }
 
-  if (now - lastTime_LCD >= interval_LCD) {
-    lastTime_LCD = now;
-    
-    oled.showText(1, 12, 8, "Temp: " + String(temp));
-    oled.showText(1, 12, 16, "DO: " + String(DO_value));
-    oled.showText(1, 12, 24, "PH: " + String(PH_value));
-    oled.showText(1, 12, 32, "EC: " + String(EC_value));
+  if (now - lastTime_SendData >= interval_SendData) {
+    lastTime_SendData = now;
+    SendData();
   }
 
-  phSensor.calibration(temperature);
+  phSensor.calibration(temp);
   ecSensor.calibration(temp);
 }
 

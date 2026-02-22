@@ -1,27 +1,29 @@
 #include "PH_Sensor.h"
 
-#define VREF    3300
-#define RES 4095
+#define ESP_VREF     3300.0f   // mV
+#define ESP_ADC_RES  4095.0f   // 12-bit ADC
 
 PH_Sensor::PH_Sensor(uint8_t pin)
+: _pin(pin), _voltage(0)
 {
-  _pin = pin;
-  _voltage = 0;
 }
 
 void PH_Sensor::begin()
 {
+  EEPROM.begin(32);
   _ph.begin();
 }
 
-void PH_Sensor::update(PH_Data &data, uint8_t temperature)
+void PH_Sensor::update(PH_Data &data, float temperature)
 {
-  _voltage = (uint32_t) VREF * analogRead(_pin) / RES;
+  uint16_t raw = analogRead(_pin);
+  _voltage = (uint16_t)(raw * ESP_VREF / ESP_ADC_RES);
+
   data.voltage = _voltage;
-  data.value   = _ph.readPH(_voltage, temperature);
+  data.value   = _ph.readPH((float)_voltage, temperature);
 }
 
-void PH_Sensor::calibration(uint8_t temperature)
+void PH_Sensor::calibration(float temperature)
 {
-  _ph.calibration(_voltage, temperature);
+  _ph.calibration((float)_voltage, temperature);
 }
