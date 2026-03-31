@@ -1,7 +1,7 @@
 #include "PH_Sensor.h"
 
-#define ESP_VREF     3300.0f   // mV
-#define ESP_ADC_RES  4095.0f   // 12-bit ADC
+#define ESP_VREF     3300.0f
+#define ESP_ADC_RES  4095.0f
 
 PH_Sensor::PH_Sensor(uint8_t pin)
 : _pin(pin), _voltage(0)

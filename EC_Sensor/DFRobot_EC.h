@@ -31,7 +31,7 @@ public:
     float   readEC(float voltage, float temperature);                       // voltage to EC value, with temperature compensation
     void    begin();                                                        //initialization
 
-private:
+public:
     float  _ecvalue;
     float  _kvalue;
     float  _kvalueLow;

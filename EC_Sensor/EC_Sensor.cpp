@@ -12,11 +12,13 @@ EC_Sensor::EC_Sensor(uint8_t pin)
 void EC_Sensor::begin()
 {
   _ec.begin();
+  Serial.println(_ec._kvalueLow);
+  Serial.println(_ec._kvalueHigh);
 }
 
 void EC_Sensor::update(EC_Data &data, uint8_t temperature)
 {
-  _voltage = (uint32_t)VREF * analogRead(_pin) / ADC_RES;
+ _voltage = (uint32_t)VREF * analogRead(_pin) / ADC_RES;
   data.voltage = _voltage;
   data.value   = _ec.readEC(_voltage, temperature);
 }

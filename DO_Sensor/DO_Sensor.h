@@ -8,8 +8,9 @@ class DO_Sensor {
     struct DO_Data {
       uint16_t raw;
       uint16_t voltage;
-      uint16_t value;
+      float value;
     };
+
     DO_Sensor(uint8_t doPin);
     void update(DO_Data &data, uint8_t temp); 
 

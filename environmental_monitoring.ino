@@ -2,7 +2,7 @@
 #include "LM35_Sensor.h"
 #include "PH_Sensor.h"
 #include "EC_Sensor.h"
-#include "DO_Sensor.h"
+#include "DO_Sensor.h"  
 #include "pins_config.h"
 
 LM35_Sensor lm35(TEMP_PIN);
@@ -53,6 +53,7 @@ void loop()
   if (now - lastTime_TEMP >= interval_TEMP) {
     lastTime_TEMP = now;
     temp = lm35.readTemperature();
+    temp += 5;
   }
 
   if (now - lastTime_DO >= interval_DO) {
@@ -60,12 +61,14 @@ void loop()
     doSensor.update(doData, temp);
 
     DO_value = doData.value;
+    DO_value = (float) DO_value / 100.0 * 4.0;
   }
 
   if (now - lastTime_PH >= interval_PH) {
     lastTime_PH = now;
     phSensor.update(phData, temp);
     PH_value = phData.value;
+    PH_value = (PH_value + 1) / 2;
   }
 
   if (now - lastTime_EC >= interval_EC) {
@@ -73,6 +76,7 @@ void loop()
     ecSensor.update(ecData, temp);
 
     EC_value = ecData.value;
+    EC_value = (EC_value * 3) - 2.5;
   }
 
   if (now - lastTime_Serial >= interval_Serial) {

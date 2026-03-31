@@ -7,6 +7,6 @@
 #define DO_PIN 6
 
 #define TX_PIN 5
-#define RX_PIN 4
+#define RX_PIN 28
 
 #endif

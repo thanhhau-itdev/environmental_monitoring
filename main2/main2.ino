@@ -5,15 +5,14 @@
 #include "pins_config.h"
 
 SH1106 oled;
-WiFiManager wifi("abc", "55556666");
+WiFiManager wifi("^_________^", "Tieunguu09@");
 
 String TEMP = "", PH = "", EC = "", DO = "";
 
-// String create_url = "http://172.20.10.2/htqt/create/insert.php";
 String create_url = "https://htqt.vnkgu.edu.vn/create/insert.php";
 
-unsigned long lastTime_LCD = 0;
-const unsigned long interval_LCD = 5000;
+unsigned long lastTime_LCD = 0, lastTime_UploadData = 0;
+const unsigned long interval_LCD = 5000, interval_UploadData = 300000;
 
 int parseCSV(String csvLine, String fields[]) {
   int fieldIndex = 0;
@@ -52,8 +51,7 @@ void create(String t, String p, String e, String d) {
   Serial.println("URL: " + String(create_url)); 
   Serial.println("Data: " + String(postData));
   Serial.println("Response: " + String(response));
-  http.end(); 
-  delay(5000);
+  http.end();
 }
 
 void setup() {
@@ -92,8 +90,13 @@ void loop() {
                         "&ec=" + EC +
                         "&do=" + DO;
 
-      create(TEMP, PH, EC, DO);
-      Serial.println(postData);
+      
+      if (millis() - lastTime_UploadData >= interval_UploadData) {
+        lastTime_UploadData = millis();
+
+        create(TEMP, PH, EC, DO);
+        Serial.println(postData);
+      }
     }
   }
 

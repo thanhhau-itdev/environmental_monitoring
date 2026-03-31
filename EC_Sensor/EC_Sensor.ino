@@ -6,8 +6,8 @@
 */
 
 #include "../LM35_Sensor/LM35_Sensor.h"
-#include "EC_Sensor.h"
-#include "../pins_config.h"
+#include "../EC_Sensor/EC_Sensor.h"
+#include "../EC_Sensor/pins_config.h"
 
 LM35_Sensor lm35(TEMP_PIN);
 EC_Sensor   ecSensor(EC_PIN);
