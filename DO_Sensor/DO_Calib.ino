@@ -1,11 +1,12 @@
 // Chuẩn bị 2 cốc nước
-// Cốc 1 nước lạnh ~15 độ
-// Cốc 2 nước nóng ~30 độ
+// Cốc 1 nước lạnh 15 độ
+// Cốc 2 nước nóng 37 độ
 // NaOH: 40 g / mol
 // 0.5 mol → 20 g NaOH trên 1 lít nước
 // Đổ dung dịch vào 2/3 nắp màng
 // Đổ quá nhiều -> khi vặn nắp áp suất tăng -> tràn dung dịch ra ngoài -> rách màng
 // Đổ quá ít -> xảy ra hiện tượng có bọt khí -> sai giá trị
+
 #include <Arduino.h>
 
 #define VREF 3300

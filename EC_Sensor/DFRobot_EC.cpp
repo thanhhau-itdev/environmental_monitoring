@@ -30,11 +30,14 @@
 
 char* DFRobot_EC::strupr(char* str) {
     if (str == NULL) return NULL;
+
     char *ptr = str;
-    while (*ptr != ' ') {
+
+    while (*ptr != '\0') {   // dừng khi hết chuỗi
         *ptr = toupper((unsigned char)*ptr);
         ptr++;
     }
+
     return str;
 }
 
@@ -56,17 +59,23 @@ DFRobot_EC::~DFRobot_EC()
 
 void DFRobot_EC::begin()
 {
-    EEPROM_read(KVALUEADDR, this->_kvalueLow);        //read the calibrated K value from EEPROM
+    EEPROM.begin(32);
+
+    EEPROM_read(KVALUEADDR, this->_kvalueLow);
     if(EEPROM.read(KVALUEADDR)==0xFF && EEPROM.read(KVALUEADDR+1)==0xFF && EEPROM.read(KVALUEADDR+2)==0xFF && EEPROM.read(KVALUEADDR+3)==0xFF){
-        this->_kvalueLow = 1.0;                       // For new EEPROM, write default value( K = 1.0) to EEPROM
+        this->_kvalueLow = 1.0;
         EEPROM_write(KVALUEADDR, this->_kvalueLow);
+        EEPROM.commit();   // thêm dòng này
     }
-    EEPROM_read(KVALUEADDR+4, this->_kvalueHigh);     //read the calibrated K value from EEPRM
+
+    EEPROM_read(KVALUEADDR+4, this->_kvalueHigh);
     if(EEPROM.read(KVALUEADDR+4)==0xFF && EEPROM.read(KVALUEADDR+5)==0xFF && EEPROM.read(KVALUEADDR+6)==0xFF && EEPROM.read(KVALUEADDR+7)==0xFF){
-        this->_kvalueHigh = 1.0;                      // For new EEPROM, write default value( K = 1.0) to EEPROM
+        this->_kvalueHigh = 1.0;
         EEPROM_write(KVALUEADDR+4, this->_kvalueHigh);
+        EEPROM.commit();   // thêm dòng này
     }
-    this->_kvalue =  this->_kvalueLow;                // set default K value: K = kvalueLow
+
+    this->_kvalue =  this->_kvalueLow;
 }
 
 float DFRobot_EC::readEC(float voltage, float temperature)
@@ -214,8 +223,10 @@ void DFRobot_EC::ecCalibration(byte mode)
                 if(ecCalibrationFinish){   
                     if((this->_rawEC>0.9)&&(this->_rawEC<1.9)){
                         EEPROM_write(KVALUEADDR, this->_kvalueLow);
+			EEPROM.commit();   // thêm
                     }else if((this->_rawEC>9)&&(this->_rawEC<16.8)){
                         EEPROM_write(KVALUEADDR+4, this->_kvalueHigh);
+			EEPROM.commit();   // thêm
                     }
                     Serial.print(F(">>>Calibration Successful"));
                 }else{

@@ -1,6 +1,6 @@
 #include "DO_Sensor.h"
 
-#define VREF   3300
+#define VREF    3300
 #define ADC_RES 4095
 
 #define CAL1_V 963
@@ -22,13 +22,24 @@ DO_Sensor::DO_Sensor(uint8_t doPin)
 
 uint16_t DO_Sensor::readDO(uint16_t voltage, uint8_t temperature)
 {
-  uint16_t saturation = (int16_t)(temperature - CAL2_T) * (CAL1_V - CAL2_V) / (CAL1_T - CAL2_T) + CAL2_V;
+  temperature = constrain(temperature, 0, 40);
+  uint16_t saturation = (int16_t)(temperature - CAL2_T) *
+                        (CAL1_V - CAL2_V) /
+                        (CAL1_T - CAL2_T) + CAL2_V;
   return (uint32_t)voltage * DO_Table[temperature] / saturation;
 }
 
 void DO_Sensor::update(DO_Data &data, uint8_t temp)
 {
-  data.raw = analogRead(_doPin);
+  uint32_t sum = 0;
+  for(int i = 0; i < 10; i++)
+  {
+    sum += analogRead(_doPin);
+  }
+
+  data.raw = sum / 10;
+
   data.voltage = (uint32_t)VREF * data.raw / ADC_RES;
-  data.value = readDO(data.voltage, temp);
+  uint16_t do_raw = readDO(data.voltage, temp);
+  data.value = do_raw / 1000.0;
 }
