@@ -8,5 +8,4 @@
 #define I2C_SCL 3
 
 #define MAX_FIELDS 5
-
 #endif

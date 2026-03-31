@@ -8,7 +8,6 @@ SH1106 oled;
 WiFiManager wifi("^_________^", "Tieunguu09@");
 
 String TEMP = "", PH = "", EC = "", DO = "";
-
 String create_url = "https://htqt.vnkgu.edu.vn/create/insert.php";
 
 unsigned long lastTime_LCD = 0, lastTime_UploadData = 0;
@@ -90,7 +89,6 @@ void loop() {
                         "&ec=" + EC +
                         "&do=" + DO;
 
-      
       if (millis() - lastTime_UploadData >= interval_UploadData) {
         lastTime_UploadData = millis();
 
