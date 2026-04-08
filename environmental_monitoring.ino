@@ -73,6 +73,7 @@ void loop()
     ecSensor.update(ecData, temp);
 
     EC_value = ecData.value;
+    EC_value = (EC_value * 3) - 2.5;
   }
 
   if (now - lastTime_Serial >= interval_Serial) {
