@@ -1,11 +1,11 @@
 #include <Arduino.h>
-// #include "LM35_Sensor.h"
+#include "LM35_Sensor.h"
 #include "PH_Sensor.h"
 #include "EC_Sensor.h"
 #include "DO_Sensor.h"  
 #include "pins_config.h"
 
-// LM35_Sensor lm35(TEMP_PIN);
+LM35_Sensor lm35(TEMP_PIN);
 DO_Sensor doSensor(DO_PIN);
 PH_Sensor phSensor(PH_PIN);
 EC_Sensor ecSensor(EC_PIN);
@@ -22,7 +22,7 @@ const unsigned long interval_TEMP = 1000, interval_DO = 1000,
                     interval_PH = 1000, interval_EC = 1000, 
                     interval_Serial = 1000, interval_SendData = 5000;
 
-uint8_t temp = 29;
+uint8_t temp = 0;
 uint16_t DO_value = 0;
 float PH_value = 0, EC_value = 0;
 
@@ -50,10 +50,10 @@ void loop()
 {
   unsigned long now = millis();
 
-  // if (now - lastTime_TEMP >= interval_TEMP) {
-  //   lastTime_TEMP = now;
-  //   temp = lm35.readTemperature();
-  // }
+  if (now - lastTime_TEMP >= interval_TEMP) {
+    lastTime_TEMP = now;
+    temp = lm35.readTemperature();
+  }
 
   // if (now - lastTime_DO >= interval_DO) {
   //   lastTime_DO = now;
@@ -73,16 +73,15 @@ void loop()
     ecSensor.update(ecData, temp);
 
     EC_value = ecData.value;
-    EC_value = (EC_value * 3) - 2.5;
   }
 
   if (now - lastTime_Serial >= interval_Serial) {
     lastTime_Serial = now;
     
-    Serial.print("Temp: "); Serial.print(temp);
+    Serial.print("Temp: "); Serial.println(temp);
     // Serial.print(" DO: "); Serial.print(DO_value);
     // Serial.print(" PH: "); Serial.println(PH_value, 2);
-    Serial.print(" EC: "); Serial.println(EC_value, 2);
+    // Serial.print(" EC: "); Serial.println(EC_value, 2);
   }
 
   // if (now - lastTime_SendData >= interval_SendData) {
