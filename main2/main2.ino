@@ -3,9 +3,8 @@
 #include "WiFiManager.h"
 #include "SH1106.h"
 #include "pins_config.h"
-#include "OTAWebServer.h"
 
-// SH1106 oled;
+SH1106 oled;
 WiFiManager wifi("^_________^", "Tieunguu09@");
 
 String TEMP = "", PH = "", EC = "", DO = "";
@@ -58,49 +57,47 @@ void create(String t, String p, String e, String d) {
 void setup() {
   Serial.begin(115200);
   wifi.connect();
-  // ota.begin();
-  // ota.startAP();
 
   Serial1.begin(9600, SERIAL_8N1, UART_RX, UART_TX);
   Serial1.setTimeout(50);
 
-  // Wire.begin(I2C_SDA, I2C_SCL);
+  Wire.begin(I2C_SDA, I2C_SCL);
 
-  // if (!oled.begin(0x3C)) {
-  //   Serial.println("OLED init failed!");
-  //   while (1);
-  // }
+  if (!oled.begin(0x3C)) {
+    Serial.println("OLED init failed!");
+    while (1);
+  }
 
-  // oled.clear();
-  // oled.refresh();
+  oled.clear();
+  oled.refresh();
 }
 
 void loop() {
-  // if (Serial1.available()) {
-  //   String data = Serial1.readStringUntil('\n');
+  if (Serial1.available()) {
+    String data = Serial1.readStringUntil('\n');
 
-  //   String fields[MAX_FIELDS] = {"", "", "", "", ""};
-  //   int count = parseCSV(data, fields);
+    String fields[MAX_FIELDS] = {"", "", "", "", ""};
+    int count = parseCSV(data, fields);
 
-  //   if (count >= 4) {
-  //     TEMP = fields[0];
-  //     PH   = fields[1];
-  //     EC   = fields[2];
-  //     DO  = fields[3];
+    if (count >= 4) {
+      TEMP = fields[0];
+      PH   = fields[1];
+      EC   = fields[2];
+      DO  = fields[3];
 
-  //     String postData = "temp=" + TEMP +
-  //                       "&ph=" + PH +
-  //                       "&ec=" + EC +
-  //                       "&do=" + DO;
+      String postData = "temp=" + TEMP +
+                        "&ph=" + PH +
+                        "&ec=" + EC +
+                        "&do=" + DO;
 
-  //     if (millis() - lastTime_UploadData >= interval_UploadData) {
-  //       lastTime_UploadData = millis();
+      if (millis() - lastTime_UploadData >= interval_UploadData) {
+        lastTime_UploadData = millis();
 
-  //       create(TEMP, PH, EC, DO);
-  //       Serial.println(postData);
-  //     }
-  //   }
-  // }
+        create(TEMP, PH, EC, DO);
+        Serial.println(postData);
+      }
+    }
+  }
 
   if (millis() - lastTime_UploadData >= interval_UploadData) {
     lastTime_UploadData = millis();
@@ -114,18 +111,28 @@ void loop() {
     Serial.println(TEMP);
   }
 
-  // if (millis() - lastTime_LCD >= interval_LCD) {
-  //   lastTime_LCD = millis();
+  if (millis() - lastTime_UploadData >= interval_UploadData) {
+    lastTime_UploadData = millis();
 
-  //   oled.clear();
+    TEMP = "1";
+    PH = "2";
+    EC = "3";
+    DO = "4";
 
-  //   oled.showText(1, 0,  8,  "TEMP: " + String(TEMP));
-  //   oled.showText(1, 0,  16, "PH:   " + String(PH));
-  //   oled.showText(1, 0,  24, "EC:   " + String(EC));
-  //   oled.showText(1, 0,  32, "DO:   " + String(DO));
+    create(TEMP, PH, EC, DO);
+    Serial.println(TEMP);
+  }
 
-  //   oled.refresh();
-  // }
+  if (millis() - lastTime_LCD >= interval_LCD) {
+    lastTime_LCD = millis();
 
-  // ota.handle();
+    oled.clear();
+
+    oled.showText(1, 0,  8,  "TEMP: " + String(TEMP));
+    oled.showText(1, 0,  16, "PH:   " + String(PH));
+    oled.showText(1, 0,  24, "EC:   " + String(EC));
+    oled.showText(1, 0,  32, "DO:   " + String(DO));
+
+    oled.refresh();
+  }
 }

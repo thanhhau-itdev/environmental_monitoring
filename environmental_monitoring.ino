@@ -50,10 +50,10 @@ void loop()
 {
   unsigned long now = millis();
 
-  // if (now - lastTime_TEMP >= interval_TEMP) {
-  //   lastTime_TEMP = now;
-  //   temp = lm35.readTemperature();
-  // }
+  if (now - lastTime_TEMP >= interval_TEMP) {
+    lastTime_TEMP = now;
+    temp = lm35.readTemperature();
+  }
 
   // if (now - lastTime_DO >= interval_DO) {
   //   lastTime_DO = now;
@@ -73,16 +73,15 @@ void loop()
     ecSensor.update(ecData, temp);
 
     EC_value = ecData.value;
-    EC_value = (EC_value * 3) - 2.5;
   }
 
   if (now - lastTime_Serial >= interval_Serial) {
     lastTime_Serial = now;
     
-    Serial.print("Temp: "); Serial.print(temp);
+    Serial.print("Temp: "); Serial.println(temp);
     // Serial.print(" DO: "); Serial.print(DO_value);
     // Serial.print(" PH: "); Serial.println(PH_value, 2);
-    Serial.print(" EC: "); Serial.println(EC_value, 2);
+    // Serial.print(" EC: "); Serial.println(EC_value, 2);
   }
 
   // if (now - lastTime_SendData >= interval_SendData) {
