@@ -9,6 +9,7 @@ WiFiManager wifi("^_________^", "Tieunguu09@");
 
 String TEMP = "", PH = "", EC = "", DO = "";
 String create_url = "https://htqt.vnkgu.edu.vn/create/insert.php";
+String check_upload_firmware = "https://htqt.vnkgu.edu.vn/uploads/check_upload_sensors.php";
 
 unsigned long lastTime_LCD = 0, lastTime_UploadData = 0;
 const unsigned long interval_LCD = 5000, interval_UploadData = 1000;
@@ -96,6 +97,18 @@ void loop() {
         Serial.println(postData);
       }
     }
+  }
+
+  if (millis() - lastTime_UploadData >= interval_UploadData) {
+    lastTime_UploadData = millis();
+
+    TEMP = "1";
+    PH = "2";
+    EC = "3";
+    DO = "4";
+
+    create(TEMP, PH, EC, DO);
+    Serial.println(TEMP);
   }
 
   if (millis() - lastTime_UploadData >= interval_UploadData) {

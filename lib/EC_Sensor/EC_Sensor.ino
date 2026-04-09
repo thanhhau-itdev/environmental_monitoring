@@ -3,6 +3,7 @@
  *   enterec -> vào chế độ hiệu chuẩn
  *   calec -> hiệu chuẩn với dung dịch đệm chuẩn, hai dung dịch đệm (1413us/cm và 12.88ms/cm) sẽ được tự động nhận diện
  *   exitec -> lưu các thông số đã hiệu chuẩn và thoát khỏi chế độ hiệu chuẩn
+ * Nếu không có cảm biến nhiệt độ gán cứng biến temp thành nhiệt độ đo thực tế.
 */
 
 #include "../LM35_Sensor/LM35_Sensor.h"

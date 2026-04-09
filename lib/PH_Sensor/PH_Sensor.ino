@@ -3,6 +3,7 @@
  * enterph -> vào chế độ hiệu chuẩn
  * calph   -> hiệu chuẩn với dung dịch đệm chuẩn, hai dung dịch đệm (4.0 và 7.0) sẽ được tự động nhận diện
  * exitph  -> ưu các thông số đã hiệu chuẩn và thoát khỏi chế độ hiệu chuẩn
+ * Nếu không có cảm biến nhiệt độ gán cứng biến temp thành nhiệt độ đo thực tế.
 */
 
 #include "PH_Sensor.h"

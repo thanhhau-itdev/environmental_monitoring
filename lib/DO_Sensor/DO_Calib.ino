@@ -6,6 +6,7 @@
 // Đổ dung dịch vào 2/3 nắp màng
 // Đổ quá nhiều -> khi vặn nắp áp suất tăng -> tràn dung dịch ra ngoài -> rách màng
 // Đổ quá ít -> xảy ra hiện tượng có bọt khí -> sai giá trị
+// Nếu không có cảm biến nhiệt độ gán cứng biến temp thành nhiệt độ đo thực tế.
 
 #include <Arduino.h>
 
