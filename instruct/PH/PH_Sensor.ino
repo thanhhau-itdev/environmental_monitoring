@@ -8,10 +8,9 @@
 
 #include "PH_Sensor.h"
 #include "LM35_Sensor.h"
-#include "pins_config.h"
 
-LM35_Sensor lm35(TEMP_PIN);
-PH_Sensor phSensor(PH_PIN);
+LM35_Sensor lm35(4);
+PH_Sensor phSensor(3);
 PH_Sensor::PH_Data phData;
 
 unsigned long lastTime_TEMP = 0;

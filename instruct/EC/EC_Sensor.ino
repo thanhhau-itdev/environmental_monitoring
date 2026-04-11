@@ -6,12 +6,11 @@
  * Nếu không có cảm biến nhiệt độ gán cứng biến temp thành nhiệt độ đo thực tế.
 */
 
-#include "../LM35_Sensor/LM35_Sensor.h"
-#include "../EC_Sensor/EC_Sensor.h"
-#include "../EC_Sensor/pins_config.h"
+#include "LM35_Sensor.h"
+#include "EC_Sensor.h"
 
-LM35_Sensor lm35(TEMP_PIN);
-EC_Sensor   ecSensor(EC_PIN);
+LM35_Sensor lm35(4);
+EC_Sensor   ecSensor(2);
 EC_Sensor::EC_Data ecData;
 
 unsigned long lastTime_TEMP = 0;
