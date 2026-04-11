@@ -1,9 +1,8 @@
 #include "LM35_Sensor.h"
 #include "DO_Sensor.h"
-#include "pins_config.h"
 
-LM35_Sensor lm35(TEMP_PIN);
-DO_Sensor doSensor(DO_PIN);
+LM35_Sensor lm35(4);
+DO_Sensor doSensor(6);
 DO_Sensor::DO_Data doData;
 
 unsigned long lastTime_TEMP = 0;

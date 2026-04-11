@@ -2,6 +2,7 @@
 
 #define VREF 3300
 #define RES 4095
+#define SAMPLE_COUNT 50
 
 LM35_Sensor::LM35_Sensor(uint8_t pin)
 {
@@ -10,6 +11,14 @@ LM35_Sensor::LM35_Sensor(uint8_t pin)
 
 uint8_t LM35_Sensor::readTemperature()
 {
-  return (uint8_t)(((uint32_t)VREF * analogRead(_pin) / RES) / 10);
-}
+  uint32_t sum = 0;
 
+  for (uint8_t i = 0; i < SAMPLE_COUNT; i++)
+  {
+    sum += analogRead(_pin);
+    delay(2);
+  }
+
+  float voltage = (float)sum / SAMPLE_COUNT * VREF / RES;
+  return (uint8_t)(voltage / 10.0);
+}

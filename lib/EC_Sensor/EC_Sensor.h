@@ -7,8 +7,8 @@
 class EC_Sensor {
   public:
     struct EC_Data {
-      uint16_t voltage;   // mV
-      float    value;     // EC (ms/cm)
+      uint16_t voltage;
+      float    value;
     };
 
     EC_Sensor(uint8_t pin);

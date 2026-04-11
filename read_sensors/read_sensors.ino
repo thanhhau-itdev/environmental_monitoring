@@ -1,11 +1,11 @@
 #include <Arduino.h>
-// #include "LM35_Sensor.h"
+#include "LM35_Sensor.h"
 #include "PH_Sensor.h"
 #include "EC_Sensor.h"
 #include "DO_Sensor.h"  
 #include "pins_config.h"
 
-// LM35_Sensor lm35(TEMP_PIN);
+LM35_Sensor lm35(TEMP_PIN);
 DO_Sensor doSensor(DO_PIN);
 PH_Sensor phSensor(PH_PIN);
 EC_Sensor ecSensor(EC_PIN);
@@ -22,25 +22,14 @@ const unsigned long interval_TEMP = 1000, interval_DO = 1000,
                     interval_PH = 1000, interval_EC = 1000, 
                     interval_Serial = 1000, interval_SendData = 5000;
 
-uint8_t temp = 29;
+uint8_t temp = 0;
 uint16_t DO_value = 0;
 float PH_value = 0, EC_value = 0;
-
-void SendData()
-{
-  String query = "";
-  query += String(temp) + ",";
-  query += String(PH_value) + ",";
-  query += String(EC_value) + ",";
-  query += String(DO_value);
-
-  Serial1.println(query);
-}
 
 void setup()
 {
   Serial.begin(115200);
-  Serial1.begin(9600, SERIAL_8N1, RX_PIN, TX_PIN);
+  Serial1.begin(115200, SERIAL_8N1, RX_PIN, TX_PIN);
   
   ecSensor.begin();
   phSensor.begin();
@@ -55,18 +44,18 @@ void loop()
     temp = lm35.readTemperature();
   }
 
-  // if (now - lastTime_DO >= interval_DO) {
-  //   lastTime_DO = now;
-  //   doSensor.update(doData, temp);
+  if (now - lastTime_DO >= interval_DO) {
+    lastTime_DO = now;
+    doSensor.update(doData, temp);
 
-  //   DO_value = doData.value;
-  // }
+    DO_value = doData.value;
+  }
 
-  // if (now - lastTime_PH >= interval_PH) {
-  //   lastTime_PH = now;
-  //   phSensor.update(phData, temp);
-  //   PH_value = phData.value;
-  // }
+  if (now - lastTime_PH >= interval_PH) {
+    lastTime_PH = now;
+    phSensor.update(phData, temp);
+    PH_value = phData.value;
+  }
 
   if (now - lastTime_EC >= interval_EC) {
     lastTime_EC = now;
@@ -79,15 +68,19 @@ void loop()
     lastTime_Serial = now;
     
     Serial.print("Temp: "); Serial.println(temp);
-    // Serial.print(" DO: "); Serial.print(DO_value);
-    // Serial.print(" PH: "); Serial.println(PH_value, 2);
-    // Serial.print(" EC: "); Serial.println(EC_value, 2);
+    Serial.print(" DO: "); Serial.print(DO_value);
+    Serial.print(" PH: "); Serial.println(PH_value, 2);
+    Serial.print(" EC: "); Serial.println(EC_value, 2);
   }
 
-  // if (now - lastTime_SendData >= interval_SendData) {
-  //   lastTime_SendData = now;
-  //   SendData();
-  // }
+  if (now - lastTime_SendData >= interval_SendData) {
+    lastTime_SendData = now;
+    Serial1.println("temp=" + temp +
+                  "&ph=" + PH_value +
+                  "&ec=" + EC_value +
+                  "&do=" + DO_value
+                );
+  }
 
   phSensor.calibration(temp);
   ecSensor.calibration(temp);
