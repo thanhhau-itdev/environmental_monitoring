@@ -108,7 +108,6 @@ void check_firmware_status(String URL, int firmware)
       sendFirmwareUART(file);
     }
   }
-
   http.end();
 }
 
