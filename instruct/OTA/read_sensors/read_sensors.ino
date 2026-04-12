@@ -11,7 +11,7 @@ unsigned long lastReceive = 0;
 void setup()
 {
   Serial.begin(115200);
-  Serial.println("Hello firmware sensor version 2");
+  Serial.println("Hello firmware sensor version 1");
 
   Serial1.setRxBufferSize(16384); 
   Serial1.begin(115200, SERIAL_8N1, RX_PIN, TX_PIN);
