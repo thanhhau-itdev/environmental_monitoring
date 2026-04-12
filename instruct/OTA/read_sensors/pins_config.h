@@ -1,10 +1,12 @@
 #ifndef PINS_CONFIG_H
 #define PINS_CONFIG_H
 
-#define RX_PIN 5
-#define TX_PIN 28
+#define EC_PIN 2
+#define PH_PIN 3
+#define TEMP_PIN 4
+#define DO_PIN 6
 
-#define I2C_SDA 2
-#define I2C_SCL 3
+#define TX_PIN 28
+#define RX_PIN 5
 
 #endif

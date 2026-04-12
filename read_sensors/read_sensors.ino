@@ -2,8 +2,15 @@
 #include "LM35_Sensor.h"
 #include "PH_Sensor.h"
 #include "EC_Sensor.h"
-#include "DO_Sensor.h"  
+#include "DO_Sensor.h"
+#include <Update.h>
 #include "pins_config.h"
+
+bool receivingFirmware = false;
+int firmwareSize = 0;
+int receivedBytes = 0;
+uint8_t buffer[128];
+unsigned long lastReceive = 0;
 
 LM35_Sensor lm35(TEMP_PIN);
 DO_Sensor doSensor(DO_PIN);
@@ -29,6 +36,8 @@ float PH_value = 0, EC_value = 0;
 void setup()
 {
   Serial.begin(115200);
+
+  Serial1.setRxBufferSize(16384); 
   Serial1.begin(115200, SERIAL_8N1, RX_PIN, TX_PIN);
   
   ecSensor.begin();
@@ -38,6 +47,76 @@ void setup()
 void loop()
 {
   unsigned long now = millis();
+
+  if (!receivingFirmware)
+  {
+    if (Serial1.available())
+    {
+      String sizeStr = Serial1.readStringUntil('\n');
+      sizeStr.trim();
+      firmwareSize = sizeStr.toInt();
+      if (firmwareSize < 10000) return;
+
+      Serial.println("Firmware size: " + String(firmwareSize));
+
+      if (!Update.begin(firmwareSize))
+      {
+        Serial.println("Update begin failed");
+        return;
+      }
+
+      receivingFirmware = true;
+      receivedBytes = 0;
+      lastReceive = millis();
+
+      Serial1.print("K"); 
+    }
+  }
+  else
+  {
+    int remaining = firmwareSize - receivedBytes;
+    int available = Serial1.available();
+
+    if (available > 0)
+    {
+      int expected = min(remaining, 128);
+      int len = Serial1.readBytes(buffer, expected);
+
+      if (len > 0)
+      {
+        Update.write(buffer, len);
+        receivedBytes += len;
+
+        Serial.println(receivedBytes);
+        lastReceive = millis();
+
+        Serial1.print("K"); 
+      }
+    }
+
+    if (millis() - lastReceive > 8000)
+    {
+      Serial.println("UART Timeout");
+      receivingFirmware = false;
+      Update.abort();
+      return;
+    }
+
+    if (receivedBytes >= firmwareSize)
+    {
+      if (Update.end(true))
+      {
+        Serial.println("Update Success");
+        ESP.restart();
+      }
+      else
+      {
+        Serial.println("Update Failed");
+      }
+
+      receivingFirmware = false;
+    }
+  }
 
   if (now - lastTime_TEMP >= interval_TEMP) {
     lastTime_TEMP = now;
@@ -67,22 +146,22 @@ void loop()
   if (now - lastTime_Serial >= interval_Serial) {
     lastTime_Serial = now;
     
-    Serial.print("Temp: "); Serial.println(temp);
+    Serial.print("Temp: "); Serial.print(temp);
     Serial.print(" DO: "); Serial.print(DO_value);
-    Serial.print(" PH: "); Serial.println(PH_value, 2);
-    Serial.print(" EC: "); Serial.println(EC_value, 2);
+    Serial.print(" PH: "); Serial.print(PH_value, 2);
+    Serial.print(" EC: "); Serial.print(EC_value, 2);
+    Serial.println(" CAM");
   }
 
   if (now - lastTime_SendData >= interval_SendData) {
     lastTime_SendData = now;
-    Serial1.println("temp=" + temp +
-                  "&ph=" + PH_value +
-                  "&ec=" + EC_value +
-                  "&do=" + DO_value
-                );
+    Serial1.println("temp=" + String(temp) + 
+                    "&ph=" + String(PH_value) + 
+                    "&ec=" + String(EC_value) + 
+                    "&do=" + String(DO_value)
+                  );
   }
 
   phSensor.calibration(temp);
   ecSensor.calibration(temp);
 }
-

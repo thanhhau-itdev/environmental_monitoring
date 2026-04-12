@@ -5,13 +5,10 @@
 #include <WiFi.h>
 #include "pins_config.h"
 
-#define FIRMWARE_BOARD_READ_SENSOR 1
-#define FIRMWARE_BOARD_UPLOAD_DATA 2
-
 WiFiManager wifi("^_________^", "Tieunguu09@");
 
-// String check_firmware_url = "http://192.168.1.111/htqt/uploads/upload_firmware.php";
-String check_firmware_url = "https://htqt.vnkgu.edu.vn/upload_firmware.php";
+String check_firmware_url = "http://192.168.1.111/htqt/uploads/upload_firmware.php";
+// String check_firmware_url = "https://htqt.vnkgu.edu.vn/upload_firmware.php";
 
 void updateFirmware(String url) {
   WiFiClient client;
@@ -100,14 +97,14 @@ void sendFirmwareUART(String url)
   http.end();
 }
 
-void check_firmware_status(String URL, int firmware)
+void check_firmware_status(String URL, int firmware_1, int firmware_2)
 {
   if (WiFi.status() != WL_CONNECTED)
   {
     Serial.println("WiFi not connected");
     return;
   }
-  String postData = "firmware=" + String(firmware);
+  String postData = "firmware_board_read_sensor=" + String(firmware_1) + "&firmware_board_upload_data=" + String(firmware_2);
 
   HTTPClient http;
   http.begin(URL);
@@ -120,19 +117,21 @@ void check_firmware_status(String URL, int firmware)
   {
     JsonDocument jsonDoc;
     deserializeJson(jsonDoc, payload);
-    String file = jsonDoc["file"];
-    int status = jsonDoc["status"];
 
-    if (status == 1)
+    JsonObject obj = jsonDoc[0];
+    String file = obj["file"];
+    int firmware = obj["firmware"];
+
+    if (firmware == 1)
     {
       Serial.println("Software upgrade via UART");
       sendFirmwareUART(file);
     }
 
-    if (status == 2)
+    if (firmware == 2)
     {
       Serial.println("Direct software upgrade");
-      updateFirmware((String) jsonDoc["file"]);
+      updateFirmware(file);
     }
   }
   http.end();
@@ -144,8 +143,8 @@ void setup()
   Serial1.begin(115200, SERIAL_8N1, RX_PIN, TX_PIN);
   wifi.connect();
 
-  check_firmware_status(check_firmware_url, FIRMWARE_BOARD_UPLOAD_DATA);
-  Serial.println("Hello firmware upload version 2");
+  check_firmware_status(check_firmware_url, FIRMWARE_BOARD_READ_SENSOR, FIRMWARE_BOARD_UPLOAD_DATA);
+  Serial.println("Hello firmware upload version 1");
 }
 
 void loop()
