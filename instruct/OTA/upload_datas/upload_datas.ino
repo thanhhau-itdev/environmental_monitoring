@@ -9,6 +9,7 @@
 #define FIRMWARE_BOARD_UPLOAD_DATA 2
 
 WiFiManager wifi("^_________^", "Tieunguu09@");
+
 // String check_firmware_url = "http://192.168.1.111/htqt/uploads/upload_firmware.php";
 String check_firmware_url = "https://htqt.vnkgu.edu.vn/upload_firmware.php";
 
