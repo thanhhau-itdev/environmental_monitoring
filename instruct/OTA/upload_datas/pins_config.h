@@ -6,4 +6,7 @@
 
 #define I2C_SDA 2
 #define I2C_SCL 3
+
+#define FIRMWARE_BOARD_READ_SENSOR 1
+#define FIRMWARE_BOARD_UPLOAD_DATA 2
 #endif
