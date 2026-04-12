@@ -4,10 +4,11 @@
 #include <WiFi.h>
 #include "pins_config.h"
 
-#define STATUS 2
+#define FIRMWARE_BOARD_READ_SENSOR 1
+#define FIRMWARE_BOARD_UPLOAD_DATA 2
 
-WiFiManager wifi("dev", "0788806282");
-String check_firmware_url = "http://192.168.1.3/htqt/uploads/upload_firmware.php";
+WiFiManager wifi("^_________^", "Tieunguu09@");
+String check_firmware_url = "http://192.168.1.111/htqt/uploads/upload_firmware.php";
 
 void sendFirmwareUART(String url)
 {
@@ -85,26 +86,19 @@ void check_firmware_status(String URL, int firmware)
     Serial.println("WiFi not connected");
     return;
   }
-
   String postData = "firmware=" + String(firmware);
 
   HTTPClient http;
-
   http.begin(URL);
   http.addHeader("Content-Type", "application/x-www-form-urlencoded");
-
   int httpCode = http.POST(postData);
-
   String payload = http.getString();
-
   Serial.println("Payload: " + payload);
 
   if (httpCode == 200)
   {
     JsonDocument jsonDoc;
-
     deserializeJson(jsonDoc, payload);
-
     String file = jsonDoc["file"];
     int status = jsonDoc["status"];
 
@@ -124,7 +118,7 @@ void setup()
   Serial1.begin(115200, SERIAL_8N1, RX_PIN, TX_PIN);
   wifi.connect();
 
-  check_firmware_status(check_firmware_url, STATUS);
+  check_firmware_status(check_firmware_url, FIRMWARE_BOARD_UPLOAD_DATA);
   Serial.println("Hello firmware upload version 1");
 }
 
