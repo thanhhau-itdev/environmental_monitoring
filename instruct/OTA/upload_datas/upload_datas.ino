@@ -1,6 +1,7 @@
 #include "WiFiManager.h"
 #include "ArduinoJson.h"
 #include <HTTPClient.h>
+#include <HTTPUpdate.h>
 #include <WiFi.h>
 #include "pins_config.h"
 
@@ -8,7 +9,27 @@
 #define FIRMWARE_BOARD_UPLOAD_DATA 2
 
 WiFiManager wifi("^_________^", "Tieunguu09@");
-String check_firmware_url = "http://192.168.1.111/htqt/uploads/upload_firmware.php";
+
+// String check_firmware_url = "http://192.168.1.111/htqt/uploads/upload_firmware.php";
+String check_firmware_url = "https://htqt.vnkgu.edu.vn/upload_firmware.php";
+
+void updateFirmware(String url) {
+  WiFiClient client;
+
+  switch (httpUpdate.update(client, url)) {
+    case HTTP_UPDATE_FAILED:
+      Serial.printf("Update Failed. Error (%d): %s\n",
+                    httpUpdate.getLastError(),
+                    httpUpdate.getLastErrorString().c_str());
+      break;
+    case HTTP_UPDATE_NO_UPDATES:
+      Serial.println("No Update.");
+      break;
+    case HTTP_UPDATE_OK:
+      Serial.println("Update Success. Rebooting...");
+      break;
+  }
+}
 
 void sendFirmwareUART(String url)
 {
@@ -102,10 +123,16 @@ void check_firmware_status(String URL, int firmware)
     String file = jsonDoc["file"];
     int status = jsonDoc["status"];
 
+    if (status == 1)
+    {
+      Serial.println("Software upgrade via UART");
+      sendFirmwareUART(file);
+    }
+
     if (status == 2)
     {
-      Serial.println("Send Firmware via UART");
-      sendFirmwareUART(file);
+      Serial.println("Direct software upgrade");
+      updateFirmware((String) jsonDoc["file"]);
     }
   }
   http.end();
@@ -118,7 +145,7 @@ void setup()
   wifi.connect();
 
   check_firmware_status(check_firmware_url, FIRMWARE_BOARD_UPLOAD_DATA);
-  Serial.println("Hello firmware upload version 1");
+  Serial.println("Hello firmware upload version 2");
 }
 
 void loop()
