@@ -13,7 +13,7 @@ WiFiManager wifi("^_________^", "Tieunguu09@");
 // String create_url = "http://192.168.1.111/htqt/create/insert.php";
 String check_firmware_url = "https://htqt.vnkgu.edu.vn/upload_firmware.php";
 String create_url = "https://htqt.vnkgu.edu.vn/create/insert.php";
-String TEMP = "", PH = "", EC = "", DO = "";
+String TEMP = "", PH = "", EC = "", DO = "", OTA = "";
 
 unsigned long lastTime_LCD = 0, lastTime_UploadData = 0, lastTime_checkFirmware = 0;
 const unsigned long interval_LCD = 6000, interval_UploadData = 300000, interval_checkFirmware = 300000;
@@ -179,10 +179,11 @@ void loop()
   if (Serial1.available()) {
     String data = Serial1.readStringUntil('\n');
 
-    TEMP = data.substring(data.indexOf("temp=") + 5, data.indexOf("&ph")).toFloat();
-    PH = data.substring(data.indexOf("ph=") + 3, data.indexOf("&ec")).toFloat();
-    EC = data.substring(data.indexOf("ec=") + 3, data.indexOf("&do")).toFloat();
-    DO = data.substring(data.indexOf("do=") + 3).toFloat();
+    TEMP = data.substring(data.indexOf("temp=") + 5, data.indexOf("&ph"));
+    PH = data.substring(data.indexOf("ph=") + 3, data.indexOf("&ec"));
+    EC = data.substring(data.indexOf("ec=") + 3, data.indexOf("&do"));
+    DO = data.substring(data.indexOf("do=") + 3, data.indexOf("&ota"));
+    OTA = data.substring(data.indexOf("ota=") + 4);
 
     if (millis() - lastTime_UploadData >= interval_UploadData) {
       lastTime_UploadData = millis();
@@ -206,7 +207,7 @@ void loop()
     oled.showText(1, 0,  16, "PH:   " + String(PH));
     oled.showText(1, 0,  24, "EC:   " + String(EC));
     oled.showText(1, 0,  32, "DO:   " + String(DO));
-    oled.showText(1, 0,  48, "CAM");
+    oled.showText(1, 0,  48, "OTA:  " + String(OTA));
 
     oled.refresh();
   }
