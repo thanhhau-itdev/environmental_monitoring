@@ -149,8 +149,7 @@ void loop()
     Serial.print("Temp: "); Serial.print(temp);
     Serial.print(" DO: "); Serial.print(DO_value);
     Serial.print(" PH: "); Serial.print(PH_value, 2);
-    Serial.print(" EC: "); Serial.print(EC_value, 2);
-    Serial.println(" CAM");
+    Serial.print(" EC: "); Serial.println(EC_value, 2);
   }
 
   if (now - lastTime_SendData >= interval_SendData) {
@@ -158,7 +157,8 @@ void loop()
     Serial1.println("temp=" + String(temp) + 
                     "&ph=" + String(PH_value) + 
                     "&ec=" + String(EC_value) + 
-                    "&do=" + String(DO_value)
+                    "&do=" + String(DO_value) +
+                    "&ota=" + "TN_TEST"
                   );
   }
 
