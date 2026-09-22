@@ -1,23 +1,3 @@
-/*
- * file DFRobot_ESP_PH.cpp * @ https://github.com/GreenPonik/DFRobot_ESP_PH_BY_GREENPONIK
- *
- * Arduino library for Gravity: Analog pH Sensor / Meter Kit V2, SKU: SEN0161-V2
- * 
- * Based on the @ https://github.com/DFRobot/DFRobot_PH
- * Copyright   [DFRobot](http://www.dfrobot.com), 2018
- * Copyright   GNU Lesser General Public License
- *
- * ##################################################
- * ##################################################
- * ########## Fork on github by GreenPonik ##########
- * ############# ONLY ESP COMPATIBLE ################
- * ##################################################
- * ##################################################
- * 
- * version  V1.0
- * date  2019-05
- */
-
 #include "Arduino.h"
 #include "DFRobot_ESP_PH.h"
 #include "EEPROM.h"
@@ -28,8 +8,8 @@ DFRobot_ESP_PH::DFRobot_ESP_PH()
 {
     this->_temperature = 25.0;
     this->_phValue = 7.0;
-    this->_acidVoltage = 2032.44;   //buffer solution 4.0 at 25C
-    this->_neutralVoltage = 1500.0; //buffer solution 7.0 at 25C
+    this->_acidVoltage = 2032.44;
+    this->_neutralVoltage = 1500.0;
     this->_voltage = 1500.0;
 }
 
@@ -59,19 +39,9 @@ void DFRobot_ESP_PH::begin()
 
 float DFRobot_ESP_PH::readPH(float voltage, float temperature)
 {
-    // Serial.print("_neutraVoltage:");
-    // Serial.print(this->_neutralVoltage);
-    // Serial.print(", _acidVoltage:");
-    // Serial.print(this->_acidVoltage);
-    float slope = (7.0 - 4.0) / ((this->_neutralVoltage - 1500.0) / 3.0 - (this->_acidVoltage - 1500.0) / 3.0); // two point: (_neutralVoltage,7.0),(_acidVoltage,4.0)
+    float slope = (7.0 - 4.0) / ((this->_neutralVoltage - 1500.0) / 3.0 - (this->_acidVoltage - 1500.0) / 3.0);
     float intercept = 7.0 - slope * (this->_neutralVoltage - 1500.0) / 3.0;
-    // Serial.print(", slope:");
-    // Serial.print(slope);
-    // Serial.print(", intercept:");
-    // Serial.println(intercept);
     this->_phValue = slope * (voltage - 1500.0) / 3.0 + intercept; //y = k*x + b
-    // Serial.print("[readPH]... phValue ");
-    // Serial.println(this->_phValue);
     return this->_phValue;
 }
 
