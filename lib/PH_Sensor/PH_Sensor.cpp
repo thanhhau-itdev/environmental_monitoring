@@ -27,3 +27,8 @@ void PH_Sensor::calibration(float temperature)
 {
   _ph.calibration((float)_voltage, temperature);
 }
+
+void PH_Sensor::calibration(float temperature, char *cmd)
+{
+  _ph.calibration((float)_voltage, temperature, cmd);
+}

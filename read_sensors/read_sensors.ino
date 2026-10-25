@@ -6,11 +6,18 @@
 #include <Update.h>
 #include "pins_config.h"
 
+#define FIRMWARE_MIN_SIZE 10000
+#define FIRMWARE_MAX_SIZE 0x180000   // kích thước phân vùng app trong partitions.csv
+#define CMD_BUFFER_SIZE   16
+
 bool receivingFirmware = false;
 int firmwareSize = 0;
 int receivedBytes = 0;
 uint8_t buffer[128];
 unsigned long lastReceive = 0;
+
+char cmdBuffer[CMD_BUFFER_SIZE];
+uint8_t cmdIndex = 0;
 
 LM35_Sensor lm35(TEMP_PIN);
 DO_Sensor doSensor(DO_PIN);
@@ -21,25 +28,62 @@ DO_Sensor::DO_Data doData;
 PH_Sensor::PH_Data phData;
 EC_Sensor::EC_Data ecData;
 
-unsigned long lastTime_TEMP = 0, lastTime_DO = 0, 
-              lastTime_PH = 0, lastTime_EC = 0, 
+unsigned long lastTime_TEMP = 0, lastTime_DO = 0,
+              lastTime_PH = 0, lastTime_EC = 0,
               lastTime_Serial = 0, lastTime_SendData = 0;
 
-const unsigned long interval_TEMP = 1000, interval_DO = 1000, 
-                    interval_PH = 1000, interval_EC = 1000, 
+const unsigned long interval_TEMP = 1000, interval_DO = 1000,
+                    interval_PH = 1000, interval_EC = 1000,
                     interval_Serial = 1000, interval_SendData = 5000;
 
-uint8_t temp = 0;
-uint16_t DO_value = 0;
+float temp = 0;
+float DO_value = 0;
 float PH_value = 0, EC_value = 0;
+
+// Chỉ chấp nhận chuỗi toàn chữ số, tránh hiểu nhầm dữ liệu rác thành kích thước firmware
+bool isNumber(const String &s)
+{
+  if (s.length() == 0) return false;
+  for (unsigned int i = 0; i < s.length(); i++)
+  {
+    if (!isDigit(s[i])) return false;
+  }
+  return true;
+}
+
+// Đọc một dòng lệnh hiệu chuẩn từ Serial rồi chuyển cho cả pH và EC,
+// để thư viện pH không đọc mất lệnh của EC
+void handleCalibrationCommand()
+{
+  while (Serial.available() > 0)
+  {
+    char c = Serial.read();
+    if (c == '\r') continue;
+
+    if (c == '\n' || cmdIndex == CMD_BUFFER_SIZE - 1)
+    {
+      cmdBuffer[cmdIndex] = '\0';
+      if (cmdIndex > 0)
+      {
+        phSensor.calibration(temp, cmdBuffer);
+        ecSensor.calibration(temp, cmdBuffer);
+      }
+      cmdIndex = 0;
+    }
+    else
+    {
+      cmdBuffer[cmdIndex++] = c;
+    }
+  }
+}
 
 void setup()
 {
   Serial.begin(115200);
 
-  Serial1.setRxBufferSize(16384); 
+  Serial1.setRxBufferSize(16384);
   Serial1.begin(115200, SERIAL_8N1, RX_PIN, TX_PIN);
-  
+
   ecSensor.begin();
   phSensor.begin();
 }
@@ -54,8 +98,10 @@ void loop()
     {
       String sizeStr = Serial1.readStringUntil('\n');
       sizeStr.trim();
+      if (!isNumber(sizeStr)) return;
+
       firmwareSize = sizeStr.toInt();
-      if (firmwareSize < 10000) return;
+      if (firmwareSize < FIRMWARE_MIN_SIZE || firmwareSize > FIRMWARE_MAX_SIZE) return;
 
       Serial.println("Firmware size: " + String(firmwareSize));
 
@@ -69,7 +115,7 @@ void loop()
       receivedBytes = 0;
       lastReceive = millis();
 
-      Serial1.print("K"); 
+      Serial1.print("K");
     }
   }
   else
@@ -84,13 +130,17 @@ void loop()
 
       if (len > 0)
       {
-        Update.write(buffer, len);
+        if (Update.write(buffer, len) != (size_t)len)
+        {
+          Serial.println("Update write failed");
+          receivingFirmware = false;
+          Update.abort();
+          return;
+        }
         receivedBytes += len;
-
-        Serial.println(receivedBytes);
         lastReceive = millis();
 
-        Serial1.print("K"); 
+        Serial1.print("K");
       }
     }
 
@@ -125,7 +175,8 @@ void loop()
 
   if (now - lastTime_DO >= interval_DO) {
     lastTime_DO = now;
-    doSensor.update(doData, temp);
+    // Bảng bão hòa DO tra theo từng độ C nên làm tròn nhiệt độ
+    doSensor.update(doData, (uint8_t)lroundf(constrain(temp, 0.0f, 40.0f)));
 
     DO_value = doData.value;
   }
@@ -145,23 +196,23 @@ void loop()
 
   if (now - lastTime_Serial >= interval_Serial) {
     lastTime_Serial = now;
-    
-    Serial.print("Temp: "); Serial.print(temp);
-    Serial.print(" DO: "); Serial.print(DO_value);
+
+    Serial.print("Temp: "); Serial.print(temp, 1);
+    Serial.print(" DO: "); Serial.print(DO_value, 2);
     Serial.print(" PH: "); Serial.print(PH_value, 2);
     Serial.print(" EC: "); Serial.println(EC_value, 2);
   }
 
-  if (now - lastTime_SendData >= interval_SendData) {
+  // Không gửi số liệu khi đang nhận firmware, board upload sẽ hiểu nhầm là ACK
+  if (!receivingFirmware && now - lastTime_SendData >= interval_SendData) {
     lastTime_SendData = now;
-    Serial1.println("temp=" + String(temp) + 
-                    "&ph=" + String(PH_value) + 
-                    "&ec=" + String(EC_value) + 
-                    "&do=" + String(DO_value) +
+    Serial1.println("temp=" + String(temp, 1) +
+                    "&ph=" + String(PH_value, 2) +
+                    "&ec=" + String(EC_value, 2) +
+                    "&do=" + String(DO_value, 2) +
                     "&ota=" + "TN_TEST"
                   );
   }
 
-  phSensor.calibration(temp);
-  ecSensor.calibration(temp);
+  handleCalibrationCommand();
 }

@@ -8,7 +8,7 @@ LM35_Sensor::LM35_Sensor(uint8_t pin)
   _pin = pin;
 }
 
-uint8_t LM35_Sensor::readTemperature()
+float LM35_Sensor::readTemperature()
 {
   return (analogRead(_pin) * VREF / RES) / 10.0;
-}
+}

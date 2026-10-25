@@ -16,14 +16,19 @@ void EC_Sensor::begin()
   Serial.println(_ec._kvalueHigh);
 }
 
-void EC_Sensor::update(EC_Data &data, uint8_t temperature)
+void EC_Sensor::update(EC_Data &data, float temperature)
 {
   _voltage = (uint32_t)VREF * analogRead(_pin) / ADC_RES;
   data.voltage = _voltage;
   data.value   = _ec.readEC(_voltage, temperature);
 }
 
-void EC_Sensor::calibration(uint8_t temperature)
+void EC_Sensor::calibration(float temperature)
 {
   _ec.calibration(_voltage, temperature);
+}
+
+void EC_Sensor::calibration(float temperature, char *cmd)
+{
+  _ec.calibration(_voltage, temperature, cmd);
 }
