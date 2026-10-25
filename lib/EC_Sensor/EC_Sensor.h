@@ -13,8 +13,9 @@ class EC_Sensor {
 
     EC_Sensor(uint8_t pin);
     void begin();
-    void update(EC_Data &data, uint8_t temperature);
-    void calibration(uint8_t temperature);
+    void update(EC_Data &data, float temperature);
+    void calibration(float temperature);
+    void calibration(float temperature, char *cmd);
 
   private:
     uint8_t _pin;

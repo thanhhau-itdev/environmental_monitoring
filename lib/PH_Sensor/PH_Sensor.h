@@ -17,6 +17,7 @@ public:
   void begin();
   void update(PH_Data &data, float temperature);
   void calibration(float temperature);
+  void calibration(float temperature, char *cmd);
 
 private:
   uint8_t _pin;
@@ -24,4 +25,4 @@ private:
   DFRobot_ESP_PH _ph;
 };
 
-#endif // PH_SENSOR_H
+#endif // PH_SENSOR_H

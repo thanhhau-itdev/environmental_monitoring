@@ -6,7 +6,7 @@
 class LM35_Sensor {
   public:
     explicit LM35_Sensor(uint8_t pin);
-    uint8_t readTemperature();
+    float readTemperature();
 
   private:
     uint8_t _pin;
