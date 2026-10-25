@@ -206,6 +206,7 @@ void loop()
   // Không gửi số liệu khi đang nhận firmware, board upload sẽ hiểu nhầm là ACK
   if (!receivingFirmware && now - lastTime_SendData >= interval_SendData) {
     lastTime_SendData = now;
+    
     Serial1.println("temp=" + String(temp, 1) +
                     "&ph=" + String(PH_value, 2) +
                     "&ec=" + String(EC_value, 2) +

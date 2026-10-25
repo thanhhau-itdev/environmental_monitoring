@@ -55,6 +55,9 @@ Dự án áp dụng **OOP cho từng module**, giúp:
 Mỗi cảm biến hoặc chức năng được đóng gói trong **class riêng**, tách thành các file `.h / .cpp` độc lập.
 
 ## Liên hệ
+- Project Manager: Nhan Hoang Vo
+- Email: vhnhan@vnkgu.edu.vn
+- DEV: Thanh Hau
 - Email: thanhhau.itdev@gmail.com
 - GitHub: [thanhhau-itdev](https://github.com/thanhhau-itdev)
 
